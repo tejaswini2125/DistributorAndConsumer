@@ -1,0 +1,458 @@
+<html>
+<head>
+<link rel="stylesheet" href="css/table.css"></link>
+<link rel="stylesheet" href="css/billing.css"></link>
+<link rel="stylesheet" href="css/loginform.css"></link>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="jquery/themes/black-tie/jquery-ui.min.css"></link>
+<script type="text/javascript" src="js/ajaxrequest.js"></script>
+<script type="text/javascript" src="js/login.js"></script>
+<script src="jquery-ui/external/jquery/jquery.js"></script>
+<script src="jquery-ui/jquery-ui.js"></script>
+<script src="highcharts/code/highcharts.js"></script>
+<script src="highcharts/code/modules/exporting.js"></script>
+<script src="highcharts/code/modules/export-data.js"></script>
+<script src="highcharts/code/modules/accessibility.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/distributors.js"></script>
+<script type="text/javascript" src="js/employee.js"></script>
+<style type="text/css">
+.height {
+	min-height: 140px;
+}
+
+.icon {
+	font-size: 47px;
+	color: #5CB85C;
+}
+
+.iconbig {
+	font-size: 77px;
+	color: #5CB85C;
+}
+
+.table>tbody>tr>.emptyrow {
+	border-top: none;
+}
+
+.table>thead>tr>.emptyrow {
+	border-bottom: none;
+}
+
+.table>tbody>tr>.highrow {
+	border-top: 3px solid;
+}
+
+input {
+	font-size: 20;
+}
+</style>
+</head>
+<body class="ui-widget-shadow" style="height: 97vh;">
+	<div id="loginwindow" class="row">
+		<div class="col-lg-3 col-md-2"></div>
+		<div class="col-lg-6 col-md-8 login-box">
+			<div class="col-lg-12 login-key">
+				<i class="fa fa-key" aria-hidden="true"></i>
+			</div>
+			<div class="col-lg-12 login-title">Login</div>
+
+			<div class="col-lg-12 login-form">
+				<div class="col-lg-12 login-form">
+					<form action="login" method="post">
+						<div class="form-group">
+							<label class="form-control-label">USERNAME</label> <input
+								type="text" id="userid" value="employee@gmail.com"
+								class="form-control">
+						</div>
+						<div class="form-group">
+							<label class="form-control-label">PASSWORD</label> <input
+								type="password" id="pwd" value="123" class="form-control" />
+						</div>
+						<div class="form-group">
+							<label class="form-control-label"></label> <select id="type"
+								class="form-control">
+								<option selected="selected">EMPLOYEE</option>
+								<option>DISTRIBUTOR</option>
+							</select>
+						</div>
+						<div id="loginerror" style="display: none; color: red"
+							class="form-group"></div>
+
+						<div class="col-lg-12 loginbttm">
+							<div class="col-lg-6 login-btm login-text">
+								<!-- Error Message -->
+							</div>
+							<div class="col-lg-6 login-btm login-button">
+								<button type="button" onClick="login()"
+									class="btn btn-outline-primary">LOGIN</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-2"></div>
+		</div>
+	</div>
+
+	<div id="homeWindow" style="display: none">
+		<div class="topnav">
+			<a style="display: none" id="home-tab" onclick="home('home-tab')"
+				class="active" href="#">Customers</a> <a style="display: none"
+				id="analisys-tab" onclick="analisys('analisys-tab')" href="#">Analysis
+				Details</a> <a id="billing-tab" class="active" href="#">Home</a> <a
+				id="logoutUser" onClick="showLogout()"
+				style="float: right; border: 1px solid" href="#">Admin</a>
+
+		</div>
+		<div class="col-md-2" style="float: right;">
+			<ul id="menu"
+				style="position: absolute; z-index: 100000; width: 100%; right: 0">
+				<li class="ui-widget-header"><div>User Profile</div></li>
+				<li><div>Change password</div></li>
+				<li><div>Update Details</div></li>
+				<li onClick="clickLogout()"><div>logout</div></li>
+			</ul>
+		</div>
+		<div style="padding-left: 16px; text-align: center">
+			<h2>Sri Sai Foods</h2>
+		</div>
+		<div id="distributorwindow">
+			<div class="tab">
+				<button id="distributorDefaultOpen" class="tablinks"
+					onclick="operHorizontalTab(event, 'order')">
+					<h6>Place Order</h6>
+				</button>
+				<button class="tablinks"
+					onclick="operHorizontalTab(event, 'received'); receivedDetails();">
+					<h6>Received Status</h6>
+				</button>
+				<button class="tablinks"
+					onclick="operHorizontalTab(event, 'return'); returnDetails();">
+					<h6>Return Status</h6>
+				</button>
+				
+				<button class="tablinks"
+					onclick="operHorizontalTab(event, 'bill-summary'); billSummary();">
+					<h6>Bill Summay</h6>
+				</button>
+			</div>
+
+			<div id="received" class="tabcontent">
+				<div class="container">
+					<label for="user">Distributor Name</label> <span name="user"
+						class="distributorName"> </span>
+
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Received Details</span> <span style="float: right">Total:
+											&#x20B9;<span id="total-received-bill"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="receivedProductItems" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Distributor Details</div>
+									<div class="panel-body">
+										<strong class="distributorName"></strong> <br> <strong>Distributor
+											ID: </strong><span class="distributorId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div id="return" class="tabcontent">
+				<div class="container">
+					<label for="user">Distributor Name</label> <span name="user"
+						class="distributorName"> </span>
+
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Return Details</span> <span style="float: right">Total:
+											&#x20B9;<span id="total-return-bill"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="returnProductItems" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+
+								</div>
+								<button onClick="returnOrder()"
+									style="float: right; padding: 8px 45px" id="returnOrder"
+									class="btn btn-primary">Return</button>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Distributor Details</div>
+									<div class="panel-body">
+										<strong class="distributorName"></strong> <br> <strong>Distributor
+											ID: </strong><span class="distributorId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div id="order" style="overflow: auto; padding: 5px"
+				class="tabcontent">
+
+				<div class="container">
+					<label for="user">Distributor Name</label> <span name="user"
+						class="distributorName"> </span>
+
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Order Summary</span> <span style="float: right">Total:
+											&#x20B9;<span id="total-bill"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="productItems" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+
+								</div>
+								<button onClick="submitOrder()"
+									style="float: right; padding: 8px 45px" id="submitOrder"
+									class="btn btn-primary">Submit</button>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Distributor Details</div>
+									<div class="panel-body">
+										<strong class="distributorName"></strong> <br> <strong>Distributor
+											ID: </strong><span class="distributorId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+							<div id="orderDetails" style="display: none" class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Order Details</div>
+									<div class="panel-body">
+										<strong>order ID: </strong><span id="orderId"></span> <br>
+										<strong>Ordered Date: </strong> <span id="orderDate"></span><br>
+										<strong>Expected Order Date: </strong> <span id="expectedDate"></span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div id="bill-summary" style="overflow: auto; padding: 5px"
+				class="tabcontent">
+
+				<div class="container">
+					<label for="user">Distributor Name</label> <span name="user"
+						class="distributorName"> </span>
+
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Bill Summary</span> <span style="float: right">Total:
+											&#x20B9;<span id="total-bill-amount"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="billItems" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Distributor Details</div>
+									<div class="panel-body">
+										<strong class="distributorName"></strong> <br> <strong>Distributor
+											ID: </strong><span class="distributorId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+							<div id="orderDetails" style="display: none" class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Order Details</div>
+									<div class="panel-body">
+										<strong>order ID: </strong><span id="orderId"></span> <br>
+										<strong>Ordered Date: </strong> <span id="orderDate"></span><br>
+										<strong>Expected Order Date: </strong> <span id="expectedDate"></span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+		<div id="employeeWindow" style="display: none">
+			<div class="tab">
+				<button id="defaultOpenEmployeeWindow" class="tablinks"
+					onclick="operHorizontalTab(event, 'order-details')">
+					<h6>Sale Summary</h6>
+				</button>
+				<button class="tablinks"
+					onclick="operHorizontalTab(event, 'assign-details'); assignOrderDetails()">
+					<h6>Assign Orders</h6>
+				</button>
+				<button class="tablinks" onclick="distributorMissed(event)">
+					<h6>Distributor Details</h6>
+				</button>
+
+			</div>
+
+			<div id="sale-details" class="tabcontent">
+				<div class="container">
+					<label for="user">Employee Name</label> 
+					<span name="user" class="employeeName"></span>
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Distributor Summary</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="distributor-missed-tbl" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Employees Details</div>
+									<div class="panel-body">
+										<strong class="employeeName"></strong> <br> <strong>Employee
+											ID: </strong><span class="employeeId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="order-details" style="overflow: auto; padding: 5px"
+				class="tabcontent">
+				<div class="container">
+					<label for="user">Employee Name</label> 
+					<span name="user" class="employeeName"> </span>
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Sale Summary</span> <span style="float: right">Total
+											Quantity: &#x20B9;<span id="total-quantity"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="order-details-tbl" class="table-responsive" style="max-height: 58vh; overflow-y: auto"></div>
+								</div>
+								<button onClick="acceptOrder()"
+									style="float: right; padding: 8px 45px" id="acceptOrder"
+									class="btn btn-primary">Accept Order</button>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Employees Details</div>
+									<div class="panel-body">
+										<strong class="employeeName"></strong> <br> 
+										<strong>Employee ID: </strong><span class="employeeId"></span> <br> 
+										<strong>City: </strong><span>Bangalore</span><br> 
+										<strong>State: </strong><span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="assign-details" style="overflow: auto; padding: 5px"
+				class="tabcontent">
+				<div class="container">
+					<label for="distributors">Distributors Name</label> 
+					 <select onChange="getOrderDetails($(this).val())" id="assign-distributor-id" class="distributors-name" name="distributors"></select>
+					<div class="row">
+						<div class="col-md-9">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4>
+										<span>Order Assign Summary</span> <span style="float: right">Total
+											Quantity: &#x20B9;<span id="total-assign-amount"></span>
+										</span>
+									</h4>
+								</div>
+								<div class="panel-body">
+									<div id="order-assign-tbl" class="table-responsive"
+										style="max-height: 58vh; overflow-y: auto"></div>
+
+								</div>
+								<button onClick="assignOrder()"
+									style="float: right; padding: 8px 45px" id="assignOrder"
+									class="btn btn-primary">Assign Order</button>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="row">
+								<div class="panel panel-default height">
+									<div class="panel-heading">Employees Details</div>
+									<div class="panel-body">
+										<strong class="employeeName"></strong> <br> <strong>Employee
+											ID: </strong><span class="employeeId"></span> <br> <strong>City:
+										</strong> <span>Bangalore</span><br> <strong>State: </strong> <span>Karnataka</span><br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
